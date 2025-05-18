@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock Paper Scissors Online Game</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-top: 20px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        
+        h2 {
+            color: #3498db;
+            margin-bottom: 15px;
+        }
+        
+        .menu {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        button:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+        
+        input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        
+        .game-area {
+            display: none;
+        }
+        
+        .home-screen {
+            text-align: center;
+        }
+        
+        .room-info {
+            background-color: #eaf2f8;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .room-code {
+            font-weight: bold;
+            font-size: 24px;
+            color: #2c3e50;
+            letter-spacing: 5px;
+        }
+        
+        .player-status {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+        
+        .player {
+            text-align: center;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            min-width: 150px;
+        }
+        
+        .player.current {
+            background-color: #d4edda;
+        }
+        
+        .player-label {
+            font-weight: bold;
+        }
+        
+        .choices {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .choice {
+            font-size: 40px;
+            background-color: white;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .choice:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .choice:active {
+            transform: translateY(0);
+        }
+        
+        .result {
+            text-align: center;
+            font-size: 24px;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        
+        .win {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .lose {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .draw {
+            background-color: #ffeeba;
+            color: #856404;
+        }
+        
+        .waiting {
+            background-color: #e2e3e5;
+            color: #383d41;
+        }
+        
+        .status-message {
+            text-align: center;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background-color: #3498db;
+            color: white;
+            border-radius: 5px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            transform: translateX(200%);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✌️ Rock Paper Scissors ✊ ✋</h1>
+        
+        <!-- Home Screen -->
+        <div id="homeScreen" class="home-screen">
+            <h2>Online Multiplayer Game</h2>
+            <p>Create a new room or join an existing one to play!</p>
+            <div class="menu">
+                <button id="createRoomBtn">Create Room</button>
+                <button id="joinRoomBtn">Join Room</button>
+            </div>
+            <div id="joinForm" class="hidden">
+                <input type="text" id="roomCodeInput" placeholder="Enter Room Code" maxlength="6">
+                <button id="joinGameBtn">Join Game</button>
+            </div>
+        </div>
+        
+        <!-- Game Area -->
+        <div id="gameArea" class="game-area">
+            <div class="room-info">
+                <p>Room Code: <span id="roomCode" class="room-code">------</span></p>
+                <p id="waitingMessage">Waiting for another player to join...</p>
+            </div>
+            
+            <div class="player-status">
+                <div id="player1" class="player current">
+                    <div class="player-label">You</div>
+                    <div id="player1Status">Waiting...</div>
+                </div>
+                <div id="player2" class="player">
+                    <div class="player-label">Opponent</div>
+                    <div id="player2Status">Waiting...</div>
+                </div>
+            </div>
+            
+            <div id="choicesArea" class="hidden">
+                <p class="status-message" id="turnMessage">Your turn! Choose your move:</p>
+                <div class="choices">
+                    <div class="choice" data-choice="rock">✊</div>
+                    <div class="choice" data-choice="paper">✋</div>
+                    <div class="choice" data-choice="scissors">✌️</div>
+                </div>
+            </div>
+            
+            <div id="resultArea" class="hidden">
+                <div id="resultMessage" class="result"></div>
+                <button id="playAgainBtn">Play Again</button>
+                <button id="exitBtn">Exit Room</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification" class="notification"></div>
+
+    <!-- Socket.IO client script -->
+    <script src="/socket.io/socket.io.js"></script>
+    
+    <script>
+        // Connect to the socket.io server
+        const socket = io();
+        
+        // Game elements
+        const homeScreen = document.getElementById('homeScreen');
+        const gameArea = document.getElementById('gameArea');
+        const createRoomBtn = document.getElementById('createRoomBtn');
+        const joinRoomBtn = document.getElementById('joinRoomBtn');
+        const joinForm = document.getElementById('joinForm');
+        const roomCodeInput = document.getElementById('roomCodeInput');
+        const joinGameBtn = document.getElementById('joinGameBtn');
+        const roomCodeDisplay = document.getElementById('roomCode');
+        const waitingMessage = document.getElementById('waitingMessage');
+        const player1 = document.getElementById('player1');
+        const player2 = document.getElementById('player2');
+        const player1Status = document.getElementById('player1Status');
+        const player2Status = document.getElementById('player2Status');
+        const choicesArea = document.getElementById('choicesArea');
+        const turnMessage = document.getElementById('turnMessage');
+        const choices = document.querySelectorAll('.choice');
+        const resultArea = document.getElementById('resultArea');
+        const resultMessage = document.getElementById('resultMessage');
+        const playAgainBtn = document.getElementById('playAgainBtn');
+        const exitBtn = document.getElementById('exitBtn');
+        const notification = document.getElementById('notification');
+
+        // Game state
+        let gameState = {
+            roomCode: '',
+            playerChoice: null,
+            gameActive: false
+        };
+
+        // Show notification
+        function showNotification(message, duration = 3000) {
+            notification.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, duration);
+        }
+
+        // Create a new room
+        createRoomBtn.addEventListener('click', () => {
+            socket.emit('createRoom');
+        });
+
+        // Show join form
+        joinRoomBtn.addEventListener('click', () => {
+            joinForm.classList.remove('hidden');
+        });
+
+        // Join an existing room
+        joinGameBtn.addEventListener('click', () => {
+            const roomCode = roomCodeInput.value.toUpperCase();
+            
+            if (!roomCode || roomCode.length !== 6) {
+                showNotification('Please enter a valid room code');
+                return;
+            }
+            
+            socket.emit('joinRoom', roomCode);
+        });
+
+        // Socket event handlers
+        socket.on('roomCreated', (roomCode) => {
+            gameState.roomCode = roomCode;
+            roomCodeDisplay.textContent = roomCode;
+            homeScreen.style.display = 'none';
+            gameArea.style.display = 'block';
+            showNotification('Room created! Share the code with your opponent');
+        });
+
+        socket.on('roomJoined', (roomCode) => {
+            gameState.roomCode = roomCode;
+            roomCodeDisplay.textContent = roomCode;
+            homeScreen.style.display = 'none';
+            gameArea.style.display = 'block';
+            waitingMessage.textContent = 'Both players connected! Get ready...';
+            
+            // Start game after a short delay
+            setTimeout(() => {
+                waitingMessage.style.display = 'none';
+                choicesArea.classList.remove('hidden');
+                gameState.gameActive = true;
+            }, 1000);
+        });
+
+        socket.on('opponentJoined', () => {
+            waitingMessage.textContent = 'Both players connected! Get ready...';
+            
+            // Start game after a short delay
+            setTimeout(() => {
+                waitingMessage.style.display = 'none';
+                choicesArea.classList.remove('hidden');
+                gameState.gameActive = true;
+            }, 1000);
+        });
+
+        socket.on('roomError', (errorMessage) => {
+            showNotification(errorMessage);
+        });
+
+        socket.on('opponentMadeChoice', () => {
+            player2Status.textContent = 'Made a choice';
+            showNotification('Opponent made a choice!');
+        });
+
+        socket.on('gameResult', (result) => {
+            choicesArea.classList.add('hidden');
+            resultArea.classList.remove('hidden');
+            
+            player1Status.textContent = `Chose ${result.yourChoice}`;
+            player2Status.textContent = `Chose ${result.opponentChoice}`;
+            
+            if (result.result === 'draw') {
+                resultMessage.textContent = 'It\'s a tie!';
+                resultMessage.className = 'result draw';
+            } else if (result.result === 'win') {
+                resultMessage.textContent = 'You are the winner of this match!';
+                resultMessage.className = 'result win';
+            } else {
+                resultMessage.textContent = 'You lost this match!';
+                resultMessage.className = 'result lose';
+            }
+            
+            gameState.gameActive = false;
+        });
+
+        socket.on('gameReset', () => {
+            player1Status.textContent = 'Waiting...';
+            player2Status.textContent = 'Waiting...';
+            resultArea.classList.add('hidden');
+            choicesArea.classList.remove('hidden');
+            choices.forEach(c => c.style.pointerEvents = 'auto');
+            turnMessage.textContent = 'Your turn! Choose your move:';
+            gameState.playerChoice = null;
+            gameState.gameActive = true;
+        });
+
+        socket.on('opponentLeft', () => {
+            showNotification('Your opponent left the game');
+            waitingMessage.textContent = 'Waiting for another player to join...';
+            waitingMessage.style.display = 'block';
+            choicesArea.classList.add('hidden');
+            resultArea.classList.add('hidden');
+            player2Status.textContent = 'Disconnected';
+            gameState.gameActive = false;
+        });
+
+        // Handle player choices
+        choices.forEach(choice => {
+            choice.addEventListener('click', () => {
+                if (!gameState.gameActive) return;
+                
+                const selectedChoice = choice.getAttribute('data-choice');
+                gameState.playerChoice = selectedChoice;
+                
+                // Notify server about the choice
+                socket.emit('playerChoice', {
+                    roomCode: gameState.roomCode,
+                    choice: selectedChoice
+                });
+                
+                player1Status.textContent = 'Made a choice';
+                
+                // Disable choices after selection
+                choices.forEach(c => c.style.pointerEvents = 'none');
+                turnMessage.textContent = 'Waiting for opponent...';
+            });
+        });
+
+        // Play again
+        playAgainBtn.addEventListener('click', () => {
+            socket.emit('playAgain', gameState.roomCode);
+        });
+
+        // Exit room
+        exitBtn.addEventListener('click', () => {
+            socket.emit('leaveRoom', gameState.roomCode);
+            gameArea.style.display = 'none';
+            homeScreen.style.display = 'block';
+            joinForm.classList.add('hidden');
+            roomCodeInput.value = '';
+            gameState.roomCode = '';
+            gameState.playerChoice = null;
+            gameState.gameActive = false;
+        });
+    </script>
+</body>
+</html>
