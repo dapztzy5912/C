@@ -29,7 +29,7 @@ io.on('connection', (socket) => {
     console.log('New user connected:', socket.id);
 
     // Create a new game room
-    socket.on('createRoom', () => {
+    socket.on('createRoom', (playerName) => {
         let roomCode;
         
         // Generate a unique room code
@@ -41,6 +41,8 @@ io.on('connection', (socket) => {
         gameRooms[roomCode] = {
             player1: socket.id,
             player2: null,
+            player1Name: playerName || 'Player 1',
+            player2Name: null,
             player1Choice: null,
             player2Choice: null,
             gameActive: true
@@ -51,11 +53,13 @@ io.on('connection', (socket) => {
         
         // Send room code back to the client
         socket.emit('roomCreated', roomCode);
-        console.log(`Room created: ${roomCode} by player ${socket.id}`);
+        console.log(`Room created: ${roomCode} by player ${socket.id} (${playerName})`);
     });
 
     // Join an existing game room
-    socket.on('joinRoom', (roomCode) => {
+    socket.on('joinRoom', (data) => {
+        const { roomCode, playerName } = data;
+        
         // Check if room exists and is not full
         if (!gameRooms[roomCode]) {
             socket.emit('roomError', 'Room not found');
@@ -69,13 +73,17 @@ io.on('connection', (socket) => {
         
         // Join the room
         gameRooms[roomCode].player2 = socket.id;
+        gameRooms[roomCode].player2Name = playerName || 'Player 2';
         socket.join(roomCode);
         
         // Inform both players that the game can start
-        socket.emit('roomJoined', roomCode);
-        io.to(gameRooms[roomCode].player1).emit('opponentJoined');
+        socket.emit('roomJoined', {
+            roomCode: roomCode,
+            player1Name: gameRooms[roomCode].player1Name
+        });
+        io.to(gameRooms[roomCode].player1).emit('opponentJoined', playerName);
         
-        console.log(`Player ${socket.id} joined room ${roomCode}`);
+        console.log(`Player ${socket.id} (${playerName}) joined room ${roomCode}`);
     });
 
     // Handle player choice
@@ -139,6 +147,7 @@ io.on('connection', (socket) => {
                 // Notify player 1
                 io.to(room.player1).emit('opponentLeft');
                 room.player2 = null;
+                room.player2Name = null;
                 room.player2Choice = null;
                 console.log(`Player 2 left room ${roomCode}`);
             }
@@ -162,6 +171,7 @@ io.on('connection', (socket) => {
             // Player 2 is leaving, notify player 1
             io.to(room.player1).emit('opponentLeft');
             room.player2 = null;
+            room.player2Name = null;
             room.player2Choice = null;
             console.log(`Player 2 left room ${roomCode}`);
         }
