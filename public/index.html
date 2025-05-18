@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rock Paper Scissors Online Game</title>
+    <title>Suit-Online-V2</title>
     <style>
         * {
             box-sizing: border-box;
@@ -226,12 +226,12 @@
 </head>
 <body>
     <div class="container">
-        <h1>✌️ Rock Paper Scissors ✊ ✋</h1>
+        <h1>SUIT ✌️✊✋ ONLINE</h1>
         
         <!-- Home Screen -->
         <div id="homeScreen" class="home-screen">
-            <h2>Online Multiplayer Game</h2>
-            <p>Enter your name and create a new room or join an existing one to play!</p>
+            <h2>Game Multipemain Online</h2>
+            <p>Masukkan Nama Lu Dan Buat Room Baru Atau Join Memakai Code Room Yang Sudah Siap Untuk Bermain!</p>
             
             <!-- Player Name Input -->
             <div class="name-input">
@@ -252,24 +252,24 @@
         <div id="gameArea" class="game-area">
             <div class="room-info">
                 <p>Room Code: <span id="roomCode" class="room-code">------</span></p>
-                <p id="waitingMessage">Waiting for another player to join...</p>
+                <p id="waitingMessage">Menunggu Pemain Untuk Bergabung Ke Dalam Room Kamu!.</p>
             </div>
             
             <div class="player-status">
                 <div id="yourPlayer" class="player current">
-                    <div class="player-label">You</div>
-                    <div class="player-name" id="yourName">Your Name</div>
-                    <div id="yourStatus">Waiting...</div>
+                    <div class="player-label">Anda</div>
+                    <div class="player-name" id="yourName">Nama Kamu</div>
+                    <div id="yourStatus">Tunggu...</div>
                 </div>
                 <div id="opponentPlayer" class="player">
-                    <div class="player-label">Opponent</div>
+                    <div class="player-label">Lawan Mu</div>
                     <div class="player-name" id="opponentName">Waiting...</div>
-                    <div id="opponentStatus">Waiting...</div>
+                    <div id="opponentStatus">Tunggu...</div>
                 </div>
             </div>
             
             <div id="choicesArea" class="hidden">
-                <p class="status-message" id="turnMessage">Your turn! Choose your move:</p>
+                <p class="status-message" id="turnMessage">Giliran Anda! Pilih Suit Anda:</p>
                 <div class="choices">
                     <div class="choice" data-choice="rock">✊</div>
                     <div class="choice" data-choice="paper">✋</div>
@@ -279,8 +279,8 @@
             
             <div id="resultArea" class="hidden">
                 <div id="resultMessage" class="result"></div>
-                <button id="playAgainBtn">Play Again</button>
-                <button id="exitBtn">Exit Room</button>
+                <button id="playAgainBtn">Bermain Lagi</button>
+                <button id="exitBtn">Keluar Dari Room</button>
             </div>
         </div>
     </div>
