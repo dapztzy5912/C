@@ -256,15 +256,15 @@
             </div>
             
             <div class="player-status">
-                <div id="player1" class="player current">
+                <div id="yourPlayer" class="player current">
                     <div class="player-label">You</div>
-                    <div class="player-name" id="player1Name">Your Name</div>
-                    <div id="player1Status">Waiting...</div>
+                    <div class="player-name" id="yourName">Your Name</div>
+                    <div id="yourStatus">Waiting...</div>
                 </div>
-                <div id="player2" class="player">
+                <div id="opponentPlayer" class="player">
                     <div class="player-label">Opponent</div>
-                    <div class="player-name" id="player2Name">Unknown</div>
-                    <div id="player2Status">Waiting...</div>
+                    <div class="player-name" id="opponentName">Waiting...</div>
+                    <div id="opponentStatus">Waiting...</div>
                 </div>
             </div>
             
@@ -305,12 +305,12 @@
         const joinGameBtn = document.getElementById('joinGameBtn');
         const roomCodeDisplay = document.getElementById('roomCode');
         const waitingMessage = document.getElementById('waitingMessage');
-        const player1 = document.getElementById('player1');
-        const player2 = document.getElementById('player2');
-        const player1Name = document.getElementById('player1Name');
-        const player2Name = document.getElementById('player2Name');
-        const player1Status = document.getElementById('player1Status');
-        const player2Status = document.getElementById('player2Status');
+        const yourPlayer = document.getElementById('yourPlayer');
+        const opponentPlayer = document.getElementById('opponentPlayer');
+        const yourName = document.getElementById('yourName');
+        const opponentName = document.getElementById('opponentName');
+        const yourStatus = document.getElementById('yourStatus');
+        const opponentStatus = document.getElementById('opponentStatus');
         const choicesArea = document.getElementById('choicesArea');
         const turnMessage = document.getElementById('turnMessage');
         const choices = document.querySelectorAll('.choice');
@@ -326,7 +326,8 @@
             playerName: '',
             opponentName: '',
             playerChoice: null,
-            gameActive: false
+            gameActive: false,
+            isRoomCreator: false
         };
 
         // Show notification
@@ -349,7 +350,6 @@
             }
             
             gameState.playerName = playerName;
-            player1Name.textContent = playerName;
             return true;
         }
 
@@ -358,6 +358,7 @@
             if (!validateName()) return;
             
             socket.emit('createRoom', gameState.playerName);
+            gameState.isRoomCreator = true;
         });
 
         // Show join form
@@ -380,6 +381,7 @@
                 roomCode: roomCode,
                 playerName: gameState.playerName
             });
+            gameState.isRoomCreator = false;
         });
 
         // Socket event handlers
@@ -388,6 +390,8 @@
             roomCodeDisplay.textContent = roomCode;
             homeScreen.style.display = 'none';
             gameArea.style.display = 'block';
+            yourName.textContent = gameState.playerName;
+            opponentName.textContent = 'Waiting...';
             showNotification('Room created! Share the code with your opponent');
         });
 
@@ -395,8 +399,10 @@
             const { roomCode, player1Name } = data;
             gameState.roomCode = roomCode;
             gameState.opponentName = player1Name;
-            player2Name.textContent = gameState.playerName;
-            player1Name.textContent = player1Name;
+            
+            yourName.textContent = gameState.playerName;
+            opponentName.textContent = player1Name;
+            
             roomCodeDisplay.textContent = roomCode;
             homeScreen.style.display = 'none';
             gameArea.style.display = 'block';
@@ -410,10 +416,10 @@
             }, 1000);
         });
 
-        socket.on('opponentJoined', (opponentName) => {
-            gameState.opponentName = opponentName;
-            player2Name.textContent = opponentName;
+        socket.on('opponentJoined', (playerName) => {
+            gameState.opponentName = playerName;
             waitingMessage.textContent = 'Both players connected! Get ready...';
+            opponentName.textContent = playerName;
             
             // Start game after a short delay
             setTimeout(() => {
@@ -428,7 +434,7 @@
         });
 
         socket.on('opponentMadeChoice', () => {
-            player2Status.textContent = 'Made a choice';
+            opponentStatus.textContent = 'Made a choice';
             showNotification('Opponent made a choice!');
         });
 
@@ -436,8 +442,8 @@
             choicesArea.classList.add('hidden');
             resultArea.classList.remove('hidden');
             
-            player1Status.textContent = `Chose ${result.yourChoice}`;
-            player2Status.textContent = `Chose ${result.opponentChoice}`;
+            yourStatus.textContent = `Chose ${result.yourChoice}`;
+            opponentStatus.textContent = `Chose ${result.opponentChoice}`;
             
             if (result.result === 'draw') {
                 resultMessage.textContent = 'It\'s a tie!';
@@ -454,8 +460,8 @@
         });
 
         socket.on('gameReset', () => {
-            player1Status.textContent = 'Waiting...';
-            player2Status.textContent = 'Waiting...';
+            yourStatus.textContent = 'Waiting...';
+            opponentStatus.textContent = 'Waiting...';
             resultArea.classList.add('hidden');
             choicesArea.classList.remove('hidden');
             choices.forEach(c => c.style.pointerEvents = 'auto');
@@ -470,8 +476,8 @@
             waitingMessage.style.display = 'block';
             choicesArea.classList.add('hidden');
             resultArea.classList.add('hidden');
-            player2Status.textContent = 'Disconnected';
-            player2Name.textContent = 'Unknown';
+            opponentStatus.textContent = 'Disconnected';
+            opponentName.textContent = 'Waiting...';
             gameState.opponentName = '';
             gameState.gameActive = false;
         });
@@ -490,7 +496,7 @@
                     choice: selectedChoice
                 });
                 
-                player1Status.textContent = 'Made a choice';
+                yourStatus.textContent = 'Made a choice';
                 
                 // Disable choices after selection
                 choices.forEach(c => c.style.pointerEvents = 'none');
