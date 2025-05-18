@@ -263,7 +263,7 @@
                 </div>
                 <div id="opponentPlayer" class="player">
                     <div class="player-label">Lawan Mu</div>
-                    <div class="player-name" id="opponentName">Waiting...</div>
+                    <div class="player-name" id="opponentName">Tunggu...</div>
                     <div id="opponentStatus">Tunggu...</div>
                 </div>
             </div>
@@ -291,10 +291,8 @@
     <script src="/socket.io/socket.io.js"></script>
     
     <script>
-        // Connect to the socket.io server
         const socket = io();
         
-        // Game elements
         const homeScreen = document.getElementById('homeScreen');
         const gameArea = document.getElementById('gameArea');
         const playerNameInput = document.getElementById('playerNameInput');
@@ -320,7 +318,6 @@
         const exitBtn = document.getElementById('exitBtn');
         const notification = document.getElementById('notification');
 
-        // Game state
         let gameState = {
             roomCode: '',
             playerName: '',
@@ -330,7 +327,6 @@
             isRoomCreator: false
         };
 
-        // Show notification
         function showNotification(message, duration = 3000) {
             notification.textContent = message;
             notification.classList.add('show');
@@ -340,7 +336,6 @@
             }, duration);
         }
 
-        // Validate player name
         function validateName() {
             const playerName = playerNameInput.value.trim();
             
@@ -353,7 +348,6 @@
             return true;
         }
 
-        // Create a new room
         createRoomBtn.addEventListener('click', () => {
             if (!validateName()) return;
             
@@ -361,14 +355,12 @@
             gameState.isRoomCreator = true;
         });
 
-        // Show join form
         joinRoomBtn.addEventListener('click', () => {
             if (!validateName()) return;
             
             joinForm.classList.remove('hidden');
         });
 
-        // Join an existing room
         joinGameBtn.addEventListener('click', () => {
             const roomCode = roomCodeInput.value.toUpperCase();
             
@@ -384,14 +376,13 @@
             gameState.isRoomCreator = false;
         });
 
-        // Socket event handlers
         socket.on('roomCreated', (roomCode) => {
             gameState.roomCode = roomCode;
             roomCodeDisplay.textContent = roomCode;
             homeScreen.style.display = 'none';
             gameArea.style.display = 'block';
             yourName.textContent = gameState.playerName;
-            opponentName.textContent = 'Waiting...';
+            opponentName.textContent = 'Tunggu...';
             showNotification('Room created! Share the code with your opponent');
         });
 
@@ -408,7 +399,6 @@
             gameArea.style.display = 'block';
             waitingMessage.textContent = 'Both players connected! Get ready...';
             
-            // Start game after a short delay
             setTimeout(() => {
                 waitingMessage.style.display = 'none';
                 choicesArea.classList.remove('hidden');
@@ -421,7 +411,6 @@
             waitingMessage.textContent = 'Both players connected! Get ready...';
             opponentName.textContent = playerName;
             
-            // Start game after a short delay
             setTimeout(() => {
                 waitingMessage.style.display = 'none';
                 choicesArea.classList.remove('hidden');
@@ -460,8 +449,8 @@
         });
 
         socket.on('gameReset', () => {
-            yourStatus.textContent = 'Waiting...';
-            opponentStatus.textContent = 'Waiting...';
+            yourStatus.textContent = 'Tunggu...';
+            opponentStatus.textContent = 'Tunggy...';
             resultArea.classList.add('hidden');
             choicesArea.classList.remove('hidden');
             choices.forEach(c => c.style.pointerEvents = 'auto');
@@ -472,17 +461,16 @@
 
         socket.on('opponentLeft', () => {
             showNotification('Your opponent left the game');
-            waitingMessage.textContent = 'Waiting for another player to join...';
+            waitingMessage.textContent = 'Menunggu pemain lain untuk bergabung..';
             waitingMessage.style.display = 'block';
             choicesArea.classList.add('hidden');
             resultArea.classList.add('hidden');
             opponentStatus.textContent = 'Disconnected';
-            opponentName.textContent = 'Waiting...';
+            opponentName.textContent = 'Tunggu...';
             gameState.opponentName = '';
             gameState.gameActive = false;
         });
 
-        // Handle player choices
         choices.forEach(choice => {
             choice.addEventListener('click', () => {
                 if (!gameState.gameActive) return;
@@ -490,7 +478,6 @@
                 const selectedChoice = choice.getAttribute('data-choice');
                 gameState.playerChoice = selectedChoice;
                 
-                // Notify server about the choice
                 socket.emit('playerChoice', {
                     roomCode: gameState.roomCode,
                     choice: selectedChoice
@@ -498,18 +485,15 @@
                 
                 yourStatus.textContent = 'Made a choice';
                 
-                // Disable choices after selection
                 choices.forEach(c => c.style.pointerEvents = 'none');
-                turnMessage.textContent = 'Waiting for opponent...';
+                turnMessage.textContent = 'Menunggu lawan...';
             });
         });
 
-        // Play again
         playAgainBtn.addEventListener('click', () => {
             socket.emit('playAgain', gameState.roomCode);
         });
 
-        // Exit room
         exitBtn.addEventListener('click', () => {
             socket.emit('leaveRoom', gameState.roomCode);
             gameArea.style.display = 'none';
