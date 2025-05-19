@@ -557,21 +557,28 @@ input::placeholder {
 }
 
 .name-input::before {
-    content: '\f007';
+    content: '\f007'; 
     font-family: 'Font Awesome 6 Free';
     font-weight: 900;
     position: absolute;
-    left: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--primary);
+    left: 20px; 
+    top: 50%; 
+    transform: translateY(-50%); 
+    color: var(--primary); 
     z-index: 1;
     font-size: 18px;
 }
 
 .name-input input {
-    padding-left: 50px;
+    padding-left: 50px; 
     font-family: 'Lato', sans-serif;
+    height: 48px; 
+    border: 2px solid var(--gray-300); 
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-inner);
+    outline: none;
+    background-color: white;
 }
 
 #joinForm {
@@ -790,7 +797,7 @@ input::placeholder {
             const playerName = playerNameInput.value.trim();
             
             if (!playerName) {
-                showNotification('Please enter your name');
+                showNotification('Isi Nama Lu Dulu Mek');
                 return false;
             }
             
@@ -815,7 +822,7 @@ input::placeholder {
             const roomCode = roomCodeInput.value.toUpperCase();
             
             if (!roomCode || roomCode.length !== 6) {
-                showNotification('Please enter a valid room code');
+                showNotification('Harap masukkan kode room yang valid');
                 return;
             }
             
