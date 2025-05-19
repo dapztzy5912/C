@@ -778,8 +778,8 @@
         });
 
         socket.on('opponentMadeChoice', () => {
-            opponentStatus.textContent = 'Made a choice';
-            showNotification('Opponent made a choice!');
+            opponentStatus.textContent = 'Sedang Memilih Suit';
+            showNotification('Lawan Sudah Memilih Suit!');
         });
 
         socket.on('gameResult', (result) => {
@@ -790,7 +790,7 @@
             opponentStatus.textContent = `Chose ${result.opponentChoice}`;
             
             if (result.result === 'draw') {
-                resultMessage.textContent = 'It\'s a tie!';
+                resultMessage.textContent = 'Seri!';
                 resultMessage.className = 'result draw';
             } else if (result.result === 'win') {
                 resultMessage.textContent = 'Anda adalah pemenang pertandingan ini!';
@@ -805,7 +805,7 @@
 
         socket.on('gameReset', () => {
             yourStatus.textContent = 'Tunggu...';
-            opponentStatus.textContent = 'Tunggy...';
+            opponentStatus.textContent = 'Tunggu...';
             resultArea.classList.add('hidden');
             choicesArea.classList.remove('hidden');
             choices.forEach(c => c.style.pointerEvents = 'auto');
